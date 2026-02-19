@@ -1,0 +1,72 @@
+{% extends "student/layout.html" %}
+
+{% block content %}
+<div class="mb-4 d-flex align-items-center">
+    <a href="{{ url_for('student_panel.dashboard') }}"
+        class="btn btn-sm btn-outline-secondary me-3 border-0 rounded-circle">
+        <i class="bi bi-arrow-left fs-5"></i>
+    </a>
+    <h4 class="fw-bold mb-0">Due Status</h4>
+</div>
+
+{% if student.balance < 0 %} <div class="card border-danger mb-4 shadow-sm animation-pulse">
+    <div class="card-body text-center p-5">
+        <i class="bi bi-exclamation-triangle-fill text-danger display-4 mb-3"></i>
+        <h3 class="fw-bold text-danger">Payment Due</h3>
+        <p class="text-muted">You have an outstanding due amount of</p>
+        <div class="display-3 fw-bold text-dark mb-4">₹{{ student.total_due|round(2) }}</div>
+        <p class="small text-muted">Please visit the school stationery shop to clear your dues as soon as possible.</p>
+    </div>
+    </div>
+    {% else %}
+    <div class="card border-success mb-4 shadow-sm">
+        <div class="card-body text-center p-5">
+            <i class="bi bi-check-circle-fill text-success display-4 mb-3"></i>
+            <h3 class="fw-bold text-success">Account Balanced</h3>
+            <p class="text-muted">You current wallet balance is</p>
+            <div class="display-3 fw-bold text-dark mb-4">₹{{ student.balance|round(2) }}</div>
+            <p class="text-success fw-bold"><i class="bi bi-patch-check me-2"></i>No Pending Dues</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="card bg-light border-0">
+        <div class="card-body py-4">
+            <h6 class="fw-bold mb-3">Summary</h6>
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Wallet Balance</span>
+                <span class="fw-bold text-success">₹{{ student.wallet_amount|round(2) }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Outstanding Dues</span>
+                <span class="fw-bold text-danger">₹{{ student.total_due|round(2) }}</span>
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between">
+                <span class="fw-bold">Running Balance</span>
+                <span class="fw-bold fs-5 {{ 'text-success' if student.balance >= 0 else 'text-danger' }}">₹{{
+                    student.balance|round(2) }}</span>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+            }
+        }
+
+        .animation-pulse {
+            animation: pulse 2s infinite;
+        }
+    </style>
+    {% endblock %}

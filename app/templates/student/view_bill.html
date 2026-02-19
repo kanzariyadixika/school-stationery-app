@@ -1,0 +1,69 @@
+{% extends "student/layout.html" %}
+
+{% block content %}
+<div class="mb-4 d-flex align-items-center">
+    <a href="{{ url_for('student_panel.bills') }}"
+        class="btn btn-sm btn-outline-secondary me-3 border-0 rounded-circle">
+        <i class="bi bi-arrow-left fs-5"></i>
+    </a>
+    <h4 class="fw-bold mb-0">Bill Details</h4>
+</div>
+
+<div class="card p-4 shadow-sm">
+    <div class="d-flex justify-content-between border-bottom pb-3 mb-3">
+        <div>
+            <h5 class="fw-bold text-primary mb-1">Invoice #{{ bill.id }}</h5>
+            <div class="small text-muted">{{ bill.date.strftime('%B %d, %Y') }}</div>
+        </div>
+        <div class="text-end">
+            <span
+                class="badge {{ 'bg-success' if bill.status == 'paid' else 'bg-warning text-dark' }} px-3 py-2 rounded-pill">
+                {{ bill.status|upper }}
+            </span>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-borderless align-middle">
+            <thead class="bg-light border-0">
+                <tr class="small text-muted text-uppercase">
+                    <th class="ps-3">Item</th>
+                    <th class="text-center">Qty</th>
+                    <th class="text-end pe-3">Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in bill.items %}
+                <tr class="border-bottom">
+                    <td class="ps-3">
+                        <div class="fw-bold">{{ item.item.name }}</div>
+                        <div class="small text-muted">{{ item.item.sku }}</div>
+                    </td>
+                    <td class="text-center">{{ item.quantity }}</td>
+                    <td class="text-end pe-3">₹{{ item.price|round(2) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="2" class="text-end pt-3 fw-bold">Subtotal:</td>
+                    <td class="text-end pt-3 fw-bold pe-3">₹{{ bill.total_amount|round(2) }}</td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="text-end fw-bold text-primary fs-5">Total Paid:</td>
+                    <td class="text-end fw-bold text-primary fs-5 pe-3">₹{{ bill.total_amount|round(2) }}</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="mt-4 d-flex gap-2">
+        <button onclick="window.print()" class="btn btn-outline-dark w-100">
+            <i class="bi bi-printer me-2"></i>Print
+        </button>
+        <a href="{{ url_for('student_panel.bills') }}" class="btn btn-primary w-100">
+            <i class="bi bi-check2 me-2"></i>Done
+        </a>
+    </div>
+</div>
+{% endblock %}

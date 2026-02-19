@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-0 shadow">
+            <div class="card-body p-5" id="printableArea">
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold">School Shop</h2>
+                    <p class="text-muted">Receipt #{{ bill.id }}</p>
+                    <p class="small text-muted">{{ bill.date.strftime('%d %B %Y, %I:%M %p') }}</p>
+                </div>
+
+                <div class="mb-4 border-bottom pb-3">
+                    <strong>Student:</strong> {{ bill.student.name }}<br>
+                    <strong>Detailed ID:</strong> {{ bill.student.roll_no }}
+                </div>
+
+                <table class="table table-sm mb-4">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th class="text-center">Qty</th>
+                            <th class="text-end">Price</th>
+                            <th class="text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in bill.items %}
+                        <tr>
+                            <td>{{ item.item.name }}</td>
+                            <td class="text-center">{{ item.quantity }}</td>
+                            <td class="text-end">{{ item.price }}</td>
+                            <td class="text-end">{{ item.price * item.quantity }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot class="border-top">
+                        <tr>
+                            <td colspan="3" class="text-end fw-bold">Total Amount</td>
+                            <td class="text-end fw-bold">₹{{ bill.total_amount }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <div class="text-center mt-5">
+                    <p class="small text-muted">Thank you for your purchase!</p>
+                </div>
+            </div>
+            <div class="card-footer bg-white border-top-0 pb-4 text-center">
+                <button class="btn btn-primary" onclick="window.print()"><i class="bi bi-printer"></i> Print
+                    Receipt</button>
+
+                <!-- WhatsApp Share -->
+                {% set ns = namespace(items_str='') %}
+                {% for item in bill.items %}
+                {% set ns.items_str = ns.items_str + '\n- ' + item.item.name + ' (' + item.quantity|string + ' x ' +
+                item.price|string + ')' %}
+                {% endfor %}
+
+                {% set msg = "*School Shop Invoice #" ~ bill.id ~ "*\n" ~
+                "Student: " ~ bill.student.name ~ "\n" ~
+                "Date: " ~ bill.date.strftime('%d-%m-%Y') ~ "\n" ~
+                "----------------" ~
+                ns.items_str ~ "\n" ~
+                "----------------\n" ~
+                "*Total Paid: ₹" ~ bill.total_amount ~ "*" ~ "\n" ~
+                "Due Balance: ₹" ~ (bill.student.total_due if bill.student.total_due > 0 else 0) %}
+
+                {% if bill.student.parent_phone %}
+                <a href="https://wa.me/{{ bill.student.parent_phone }}?text={{ msg|urlencode }}" target="_blank"
+                    class="btn btn-success"><i class="bi bi-whatsapp"></i> Share on WhatsApp</a>
+                {% else %}
+                <a href="https://wa.me/?text={{ msg|urlencode }}" target="_blank" class="btn btn-success"><i
+                        class="bi bi-whatsapp"></i> Share (No Number)</a>
+                {% endif %}
+
+                <a href="{{ url_for('billing.pos') }}" class="btn btn-outline-secondary">New Sale</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+
+        #printableArea,
+        #printableArea * {
+            visibility: visible;
+        }
+
+        #printableArea {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+
+        .btn,
+        nav {
+            display: none !important;
+        }
+    }
+</style>
+{% endblock %}

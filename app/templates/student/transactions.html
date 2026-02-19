@@ -1,0 +1,68 @@
+{% extends "student/layout.html" %}
+
+{% block content %}
+<div class="mb-4 d-flex align-items-center">
+    <a href="{{ url_for('student_panel.dashboard') }}"
+        class="btn btn-sm btn-outline-secondary me-3 border-0 rounded-circle">
+        <i class="bi bi-arrow-left fs-5"></i>
+    </a>
+    <h4 class="fw-bold mb-0">Transaction History</h4>
+</div>
+
+<div class="card">
+    <div class="list-group list-group-flush">
+        {% for tx in transactions.items %}
+        <div class="list-group-item py-3">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="fw-bold {{ 'text-danger' if tx.type == 'PURCHASE' else 'text-success' }}">
+                        {{ tx.type }}
+                    </div>
+                    <div class="small text-muted">{{ tx.date.strftime('%d %b, %Y %I:%M %p') }}</div>
+                    {% if tx.description %}
+                    <div class="small text-dark mt-1">{{ tx.description }}</div>
+                    {% endif %}
+                </div>
+                <div class="text-end">
+                    <div class="fw-bold {{ 'text-danger' if tx.type == 'PURCHASE' else 'text-success' }}">
+                        {{ '-' if tx.type == 'PURCHASE' else '+' }}₹{{ tx.amount|round(2) }}
+                    </div>
+                    <div class="small text-muted">Bal: ₹{{ tx.balance_after|round(2) }}</div>
+                </div>
+            </div>
+            {% if tx.related_bill_id %}
+            <div class="mt-2">
+                <a href="{{ url_for('student_panel.view_bill', id=tx.related_bill_id) }}"
+                    class="btn btn-sm btn-light border small py-0 px-2">
+                    <i class="bi bi-receipt me-1"></i>View Bill #{{ tx.related_bill_id }}
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="list-group-item text-center py-5 text-muted">
+            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+            No transactions yet.
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if transactions.pages > 1 %}
+<nav class="mt-4">
+    <ul class="pagination pagination-sm justify-content-center">
+        {% for page_num in transactions.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+        {% if page_num %}
+        <li class="page-item {{ 'active' if page_num == transactions.page else '' }}">
+            <a class="page-item" class="page-link" href="{{ url_for('student_panel.transactions', page=page_num) }}">{{
+                page_num }}</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">...</span></li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

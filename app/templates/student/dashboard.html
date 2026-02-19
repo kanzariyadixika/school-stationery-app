@@ -1,0 +1,95 @@
+{% extends "student/layout.html" %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+    <div class="col-12">
+        <h4 class="fw-bold">Welcome, {{ student.name }}</h4>
+        <p class="text-muted small">Roll No: {{ student.roll_no }} | {{ student.student_class.name if
+            student.student_class else 'N/A' }}</p>
+    </div>
+
+    <!-- Status Cards -->
+    <div class="col-6 col-md-3">
+        <div class="card bg-gradient-primary status-card h-100">
+            <div class="small opacity-75">Wallet Balance</div>
+            <div class="fs-4 fw-bold">₹{{ student.wallet_amount|round(2) }}</div>
+            <i class="bi bi-wallet2 position-absolute top-50 end-0 translate-middle-y me-3 opacity-25 fs-1"></i>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card bg-danger status-card h-100">
+            <div class="small opacity-75">Total Due</div>
+            <div class="fs-4 fw-bold">₹{{ student.total_due|round(2) }}</div>
+            <i class="bi bi-clock-history position-absolute top-50 end-0 translate-middle-y me-3 opacity-25 fs-1"></i>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card bg-success status-card h-100">
+            <div class="small opacity-75">Total Purchase</div>
+            <div class="fs-4 fw-bold">₹{{ total_purchase|round(2) }}</div>
+            <i class="bi bi-cart-check position-absolute top-50 end-0 translate-middle-y me-3 opacity-25 fs-1"></i>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card bg-info status-card h-100">
+            <div class="small opacity-75">Total Paid</div>
+            <div class="fs-4 fw-bold">₹{{ total_paid|round(2) }}</div>
+            <i class="bi bi-cash-stack position-absolute top-50 end-0 translate-middle-y me-3 opacity-25 fs-1"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Transactions -->
+<div class="card mb-4">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 fw-bold">Recent Transactions</h6>
+        <a href="{{ url_for('student_panel.transactions') }}" class="btn btn-sm btn-link p-0 text-decoration-none">View
+            All</a>
+    </div>
+    <div class="list-group list-group-flush">
+        {% for tx in recent_transactions %}
+        <div class="list-group-item py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="fw-bold {{ 'text-danger' if tx.type == 'PURCHASE' else 'text-success' }}">
+                        {{ tx.type }}
+                    </div>
+                    <div class="small text-muted">{{ tx.date.strftime('%d %b, %Y %I:%M %p') }}</div>
+                </div>
+                <div class="text-end">
+                    <div class="fw-bold {{ 'text-danger' if tx.type == 'PURCHASE' else 'text-success' }}">
+                        {{ '-' if tx.type == 'PURCHASE' else '+' }}₹{{ tx.amount|round(2) }}
+                    </div>
+                    <div class="small text-muted">Bal: ₹{{ tx.balance_after|round(2) }}</div>
+                </div>
+            </div>
+            {% if tx.description %}
+            <div class="small text-muted mt-1">{{ tx.description }}</div>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="list-group-item text-center py-4 text-muted">
+            No transactions found.
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Quick Links -->
+<div class="row g-3">
+    <div class="col-6">
+        <a href="{{ url_for('student_panel.bills') }}"
+            class="card text-center p-3 text-decoration-none text-dark h-100">
+            <i class="bi bi-file-earmark-text fs-2 text-primary mb-2"></i>
+            <div class="fw-bold small">My Bills</div>
+        </a>
+    </div>
+    <div class="col-6">
+        <a href="{{ url_for('student_panel.due_status') }}"
+            class="card text-center p-3 text-decoration-none text-dark h-100">
+            <i class="bi bi-exclamation-circle fs-2 text-danger mb-2"></i>
+            <div class="fw-bold small">Due Status</div>
+        </a>
+    </div>
+</div>
+{% endblock %}

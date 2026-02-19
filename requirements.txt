@@ -1,0 +1,11 @@
+flask
+flask-sqlalchemy
+flask-login
+flask-migrate
+mysql-connector-python
+python-dotenv
+email-validator
+requests
+gunicorn
+psycopg2-binary
+

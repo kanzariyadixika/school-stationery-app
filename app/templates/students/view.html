@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <div class="display-1 text-secondary"><i class="bi bi-person-circle"></i></div>
+                </div>
+                <h4>{{ student.name }}</h4>
+                <p class="text-muted">{{ student.class_section }} | Roll: {{ student.roll_no }}</p>
+                <hr>
+                <div class="d-flex justify-content-between px-3">
+                    <span>Balance</span>
+                    {% if student.balance < 0 %} <span class="fw-bold text-danger">Due: ₹{{ student.balance|abs
+                        }}</span>
+                        {% else %}
+                        <span class="fw-bold text-success">₹{{ student.balance }}</span>
+                        {% endif %}
+                </div>
+                <hr>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#paymentModal">Receive
+                        Payment</button>
+                    <!-- WhatsApp Link -->
+                    {% set msg = 'Hello ' ~ student.name ~ ', your current due amount is ₹' ~ student.balance|abs %}
+                    {% if student.parent_phone %}
+                    <a href="https://wa.me/{{ student.parent_phone }}?text={{ msg|urlencode }}" target="_blank"
+                        class="btn btn-outline-success"><i class="bi bi-whatsapp"></i> Send Due Reminder</a>
+                    {% else %}
+                    <button disabled class="btn btn-outline-secondary">No Phone Number</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white fw-bold">Transaction History</div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tran in transactions %}
+                            <tr>
+                                <td>{{ tran.date.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>
+                                    {% if tran.type == 'PAYMENT' %}
+                                    <span class="badge bg-success">Received</span>
+                                    {% elif tran.type == 'PURCHASE' %}
+                                    <span class="badge bg-primary">Purchase</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{{ tran.type }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ tran.description }}
+                                    {% if tran.related_bill_id %}
+                                    <a href="{{ url_for('billing.invoice', id=tran.related_bill_id) }}"
+                                        class="ms-1 small text-decoration-none">View Bill</a>
+                                    {% endif %}
+                                </td>
+                                <td>₹{{ tran.amount }}</td>
+                                <td>₹{{ tran.balance_after }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form method="POST" action="{{ url_for('student.add_payment', id=student.id) }}">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Receive Payment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Amount</label>
+                        <input type="number" step="0.01" name="amount" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <input type="text" name="description" value="Cash Payment" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success">Save Payment</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

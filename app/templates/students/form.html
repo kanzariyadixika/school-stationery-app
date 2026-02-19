@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white fw-bold">{{ 'Edit' if student else 'Add' }} Student</div>
+    <div class="card-body">
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label">Full Name</label>
+                <input type="text" name="name" class="form-control" value="{{ student.name if student else '' }}"
+                    required>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Class</label>
+                    <select name="class_id" class="form-select" required>
+                        <option value="">-- Select Class --</option>
+                        {% for c in classes %}
+                        <option value="{{ c.id }}" {{ 'selected' if student and student.class_id==c.id else '' }}>{{
+                            c.name }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if not classes %}
+                    <small class="text-danger">No classes found. <a href="{{ url_for('admin.list_classes') }}">Create a
+                            class first</a>.</small>
+                    {% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Roll No</label>
+                    <input type="text" name="roll_no" class="form-control"
+                        value="{{ student.roll_no if student else '' }}">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Parent Phone (with Country Code e.g., 919876543210)</label>
+                <input type="text" name="parent_phone" class="form-control"
+                    value="{{ student.parent_phone if student else '' }}" placeholder="919999999999">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Preferred Language</label>
+                <select name="language" class="form-select">
+                    <option value="en" {{ 'selected' if student and student.language=='en' else '' }}>English</option>
+                    <option value="gu" {{ 'selected' if student and student.language=='gu' else '' }}>Gujarati</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Password {{ '(Leave blank to keep current)' if student else '' }}</label>
+                <input type="password" name="password" class="form-control" {{ 'required' if not student else '' }}>
+                {% if student %}
+                <small class="text-muted">Only enter a password if you wish to change the student's current
+                    password.</small>
+                {% endif %}
+            </div>
+            <button type="submit" class="btn btn-primary">Save Student</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

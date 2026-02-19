@@ -1,0 +1,44 @@
+{% extends "student/layout.html" %}
+
+{% block content %}
+<div class="mb-4 d-flex align-items-center">
+    <a href="{{ url_for('student_panel.dashboard') }}"
+        class="btn btn-sm btn-outline-secondary me-3 border-0 rounded-circle">
+        <i class="bi bi-arrow-left fs-5"></i>
+    </a>
+    <h4 class="fw-bold mb-0">My Profile</h4>
+</div>
+
+<div class="card p-4 mb-4 shadow-sm border-0">
+    <form method="POST">
+        <h6 class="fw-bold mb-3 border-bottom pb-2">Personal Information</h6>
+        <div class="mb-3">
+            <label class="form-label small fw-bold text-muted text-uppercase">Full Name</label>
+            <input type="text" name="name" class="form-control" value="{{ student.name }}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label small fw-bold text-muted text-uppercase">Parent Phone</label>
+            <input type="text" name="parent_phone" class="form-control" value="{{ student.parent_phone }}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label small fw-bold text-muted text-uppercase">Roll Number</label>
+            <input type="text" class="form-control bg-light" value="{{ student.roll_no }}" readonly>
+            <div class="form-text small">Roll number cannot be changed. Contact admin for corrections.</div>
+        </div>
+
+        <h6 class="fw-bold mb-3 border-bottom pb-2 mt-4">Change Password</h6>
+        <div class="mb-3">
+            <label class="form-label small fw-bold text-muted text-uppercase">Old Password</label>
+            <input type="password" name="old_password" class="form-control" placeholder="Required to change password">
+        </div>
+        <div class="mb-4">
+            <label class="form-label small fw-bold text-muted text-uppercase">New Password</label>
+            <input type="password" name="new_password" class="form-control" placeholder="Leave blank to keep current">
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
+            Update Profile
+        </button>
+    </form>
+</div>
+{% endblock %}
